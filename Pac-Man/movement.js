@@ -6,13 +6,13 @@ function component(x, y) {
     this.speedX = 0;
     this.speedY = 0;
     this.x = x;
-    this.y = y;    
+    this.y = y;
     this.currentKey = "";
     this.updatePosition = function() {              //Suppose to update PacMan's x and y, redraw P
         this.x += this.speedX;
         this.y += this.speedY;
         //ctx.drawImage(,,,);
-    }  
+    }
     this.keyPress = function(){
         document.addEventListener('keydown', function(event) {  //basic movement, change for preset
             if(event.keyCode == 37 || event.keyCode == 65) {		//Left / A Key
@@ -42,33 +42,33 @@ function component(x, y) {
                 //}
                 break;
             case "Right":
-                PacMan.speedX = 2; 
+                PacMan.speedX = 2;
                 PacMan.speedY = 0;
                 currentKey = "";
                 break;
             case "Up":
-                PacMan.speedX = 0; 
+                PacMan.speedX = 0;
                 PacMan.speedY = -2;
                 currentKey = "";
                 break;
             case "Down":
-                PacMan.speedX = 0; 
+                PacMan.speedX = 0;
                 PacMan.speedY = 2;
                 currentKey = "";
                 break;
             case "Space":                   //Stops PacMan, testing purposes
-                PacMan.speedX = 0; 
+                PacMan.speedX = 0;
                 PacMan.speedY = 0;
                 currentKey = "";
                 break;
             default:
-                PacMan.speedX = PacMan.speedX; 
+                PacMan.speedX = PacMan.speedX;
                 PacMan.speedY = PacMan.speedX;
                 currentKey = "";
                 break;
         }
         /*
-            Spot for wall collision checks, 
+            Spot for wall collision checks,
         */
     }
 }

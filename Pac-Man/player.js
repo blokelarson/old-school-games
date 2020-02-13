@@ -1,94 +1,194 @@
 
-
 class Player {
     constructor(map) {
         this.map = map;
+        this.radius = map.get_player_radius() / 2;
+        this.pos = this.map.get_player_position();
         this.row = 23;
-        this.column = 14;
-        this.currentKey = null;
-        this.speedX = 0;
+        this.column = 13;
+        this.speedX = -1.5;
         this.speedY = 0;
-        this.xPos = 400;
-        this.yPos = 400;
-
-        document.addEventListener('keydown', function(event) {  //basic movement, change for preset
-            if(event.keyCode == 37 || event.keyCode == 65) {		//Left / A Key
-                this.currentKey = "Left";
-                event.preventDefault();
-
-    		}
-            else if(event.keyCode == 38 || event.keyCode == 87) {	//Up key / W Key
-                this.currentKey = "Up";
-                event.preventDefault();
-    		}
-    		else if(event.keyCode == 39 || event.keyCode == 68) {	//Right key / D Key
-                this.currentKey = "Right";
-                event.preventDefault();
-    		}
-            else if(event.keyCode == 40 || event.keyCode == 83) {	//Down key / S Key
-                this.currentKey = "Down";
-                event.preventDefault();
-    		}
-            else if(event.keyCode == 32) {				//Space Key, stops sprite, test purposes
-    		    this.currentKey = "Space";
-    		}
-            console.log(this.currentKey);
-    	});
+        this.direction = "left";
+        this.currentButton = null;
     }
 
-    update_position() {
-        this.xPos += this.speedX;
-        this.yPos += this.speedY;
+    update_current_button(change) {
+        this.currentButton = change;
+        this.change_direction();
     }
 
-    update_movement() {
-        console.log(this.currentKey);
-        switch(this.currentKey){          //Changes speed of Pacman to respective direction
-            case "Left":                    //Separate from keypress to save direction preset
-                //if (PacMan.x-2 > other.x+width){        //Condition to check for open space
-                this.speedX = -2;
-                this.speedY = 0;
-                this.currentKey = "";
-                //}
-                break;
-            case "Right":
-                this.speedX = 2;
-                this.speedY = 0;
-                this.currentKey = "";
-                break;
-            case "Up":
-                this.speedX = 0;
-                this.speedY = -2;
-                this.currentKey = "";
-                break;
-            case "Down":
-                this.speedX = 0;
-                this.speedY = 2;
-                this.currentKey = "";
-                break;
-            case "Space":                   //Stops PacMan, testing purposes
-                this.speedX = 0;
-                this.speedY = 0;
-                this.currentKey = "";
-                break;
-            default:
-                this.speedX = this.speedX;
-                this.speedY = this.speedX;
-                this.currentKey = "";
-                break;
+    update_radius() {
+        console.log(this.map.get_player_radius());
+        this.radius = this.map.get_player_radius() / 2;
+    }
+
+    change_direction() {
+        let right = this.map.getValue(this.row, this.column + 1);
+        let left = this.map.getValue(this.row, this.column - 1);
+        let up = this.map.getValue(this.row - 1, this.column);
+        let down = this.map.getValue(this.row + 1, this.column);
+
+        if(this.currentButton == "left" && (left == 1 || left == 2)) {
+            this.direction = "left";
+            this.speedX = -1.5;
+            this.speedY = 0;
+        } else if(this.currentButton == "right" && (right == 1 || right == 2)) {
+            this.direction = "right";
+            this.speedX = 1.5;
+            this.speedY = 0;
+        } else if(this.currentButton == "up" && (up == 1 || up == 2)) {
+            console.log("We in here");
+            this.direction = "up";
+            this.speedX = 0;
+            this.speedY = -1.5;
+        } else if(this.currentButton == "down" && (down == 1 || down == 2)) {
+            this.direction = "down";
+            this.speedX = 0;
+            this.speedY = 1.5;
         }
     }
 
+    update_position() {
 
 
+        if(this.direction == "left") {
+            this.pos[0] += this.speedX;
+
+            let leftCenter = this.map.middle_value[this.row][this.column - 1];
+            if(this.pos[0] <= leftCenter[0]) {
+                this.column--;
+                let result = this.try_direction_change();
+
+                let left = this.map.getValue(this.row, this.column - 1);
+                if(left != 1 && left != 2 && (!result)) {
+                    this.pos = this.map.middle_value[this.row][this.column];
+                    this.direction = "none";
+                    this.speedX = 0;
+                    this.speedY = 0;
+                    this.currentButton = null;
+                }
+            }
+            // console.log(leftCenter);
+        }
+        if(this.direction == "up") {
+            this.pos[1] += this.speedY;
+
+            let upCenter = this.map.middle_value[this.row - 1][this.column];
+            console.log(this.pos[1], upCenter);
+            if(this.pos[1] <= upCenter[1]) {
+                this.row--;
+                console.log("Row:", this.row);
+                console.log("Current Button:", this.currentButton);
+                let result = this.try_direction_change();
+
+                let up = this.map.getValue(this.row - 1, this.column);
+                if(up != 1 && up != 2 && (!result)) {
+                    this.pos = this.map.middle_value[this.row][this.column];
+                    this.direction = "none";
+                    this.speedX = 0;
+                    this.speedY = 0;
+                    this.currentButton = null;
+                }
+            }
+        }
+        if(this.direction == "right") {
+            this.pos[0] += this.speedX;
+
+            let rightCenter = this.map.middle_value[this.row][this.column + 1];
+            if(this.pos[0] >= rightCenter[0]) {
+                this.column++;
+                let result = this.try_direction_change();
+
+                let right = this.map.getValue(this.row, this.column + 1);
+                if(right != 1 && right != 2 && !(result)) {
+                    this.pos = this.map.middle_value[this.row][this.column];
+                    this.direction = "none";
+                    this.speedX = 0;
+                    this.speedY = 0;
+                    this.currentButton = null;
+                }
+            }
+        }
+        if(this.direction == "down") {
+            this.pos[1] += this.speedY;
+
+            let downCenter = this.map.middle_value[this.row + 1][this.column];
+            if(this.pos[1] >= downCenter[1]) {
+                this.row++;
+                let result = this.try_direction_change();
+
+                let down = this.map.getValue(this.row + 1, this.column);
+                if(down != 1 && down != 2 && !(result)) {
+                    this.pos = this.map.middle_value[this.row][this.column];
+                    this.direction = "none";
+                    this.speedX = 0;
+                    this.speedY = 0;
+                    this.currentButton = null;
+                }
+            }
+        }
+    }
+
+    try_direction_change() {
+        if(this.currentButton == "up") {
+            console.log("HERE");
+            let above = this.map.getValue(this.row - 1, this.column);
+            if(above == 2 || above == 1) {
+                this.pos = this.map.middle_value[this.row][this.column];
+                this.direction = "up";
+                this.speedX = 0;
+                this.speedY = -1.5;
+                this.currentButton = null;
+                return true;
+            }
+        }
+        if(this.currentButton == "down") {
+            let down = this.map.getValue(this.row + 1, this.column);
+            if(down == 2 || down == 1) {
+                this.pos = this.map.middle_value[this.row][this.column];
+                this.direction = "down";
+                this.speedX = 0;
+                this.speedY = 1.5;
+                this.currentButton = null;
+                return true;
+            }
+        }
+        if(this.currentButton == "left") {
+            let left = this.map.getValue(this.row, this.column - 1);
+            if(left == 2 || left == 1) {
+                this.pos = this.map.middle_value[this.row][this.column];
+                this.direction = "left";
+                this.speedX = -1.5;
+                this.speedY = 0;
+                this.currentButton = null;
+                return true;
+            }
+        }
+        if(this.currentButton == "right") {
+            let right = this.map.getValue(this.row, this.column + 1);
+            if(right == 2 || right == 1) {
+                this.pos = this.map.middle_value[this.row][this.column];
+                this.direction = "right";
+                this.speedX = 1.5;
+                this.speedY = 0;
+                this.currentButton = null;
+                return true;
+            }
+        }
+        return false;
+        // if(this.currentButton == "")
+    }
+    // get_row_and_column() {
+    //     r = this.map.get_row(pos[1]);
+    // }
 
     draw() {
+        // let pos = this.map.get_player_position(this.row, this.column);
+        // console.log(pos);
         canvasContext.beginPath();
-        canvasContext.fillStyle = "green";
-        // canvasContext.arc(170 + this.column * 20 + 15, 170 + this.row * 20 + 15, 10, 0, 2 * Math.PI);
-        canvasContext.arc(this.xPos, this.yPos, 10, 0, 2 * Math.PI);
+        canvasContext.fillStyle = "red";
+        canvasContext.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
         canvasContext.fill();
         canvasContext.closePath();
-
     }
 }
