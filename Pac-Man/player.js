@@ -9,6 +9,7 @@ class Player {
         this.speedX = -1.5;
         this.speedY = 0;
         this.direction = "left";
+        this.pastdir = null;
         this.currentButton = null;
     }
 
@@ -208,10 +209,52 @@ class Player {
     draw() {
         // let pos = this.map.get_player_position(this.row, this.column);
         // console.log(pos);
-        canvasContext.beginPath();
-        canvasContext.fillStyle = "red";
-        canvasContext.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
-        canvasContext.fill();
-        canvasContext.closePath();
+        var x = this.pos[0], y = this.pos[1], ctx = canvasContext, dir = null;
+        ctx.beginPath();
+        ctx.fillStyle = "red";
+        if (this.speedX > 0){
+            dir = "R";
+            this.pastdir = dir;
+        }
+        else if (this.speedX < 0){
+            dir = "L";
+            this.pastdir = dir;
+        }
+        else if (this.speedY > 0){
+            dir = "D";
+            this.pastdir = dir;
+        }
+        else if (this.speedY < 0){
+            dir = "U";
+            this.pastdir = dir;
+        }
+        else{
+            dir = this.pastdir;
+        }
+        this.draw_dir(dir, ctx, x , y);
+        ctx.fill();
+        ctx.closePath();
+    }
+    draw_dir(dir, ctx, x, y){
+        if (dir == "R"){
+            ctx.arc(x, y, this.radius, Math.PI/6, 7 * Math.PI/6);
+            ctx.moveTo(x, y);
+            ctx.arc(x, y, this.radius, 5 * Math.PI/6, 11 * Math.PI/6);
+        }
+        else if (dir == "L"){
+            ctx.arc(x, y, this.radius, 5 * Math.PI/6, 11 * Math.PI/6,true);
+            ctx.moveTo(x, y);
+            ctx.arc(x, y, this.radius, 1 * Math.PI/6, 7 * Math.PI/6,true);
+        }
+        else if (dir == "D"){
+            ctx.arc(x, y, this.radius, 4 * Math.PI/6, 10 * Math.PI/6);
+            ctx.moveTo(x, y);
+            ctx.arc(x, y, this.radius, 8 * Math.PI/6, 14 * Math.PI/6);
+        }
+        else if (dir == "U"){
+            ctx.arc(x, y, this.radius, 2 * Math.PI/6, 8 * Math.PI/6);
+            ctx.moveTo(x, y);
+            ctx.arc(x, y, this.radius, 10 * Math.PI/6, 16 * Math.PI/6);
+        }
     }
 }
