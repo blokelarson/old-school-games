@@ -6,11 +6,12 @@ class Player {
         this.pos = this.map.get_player_position();
         this.row = 23;
         this.column = 13;
-        this.speedX = -1.5;
+        this.speedX = -2;
         this.speedY = 0;
         this.direction = "left";
         this.pastdir = null;
         this.currentButton = null;
+        this.scoreBox = new Score_Box(canvasContext, canvas.width / 2 - 75, 0, 150, 30, "black");
     }
 
     update_current_button(change) {
@@ -35,20 +36,20 @@ class Player {
 
         if(this.currentButton == "left" && (left == 1 || left == 2) && (this.pos[1] == leftPos[1])) {
             this.direction = "left";
-            this.speedX = -1.5;
+            this.speedX = -2;
             this.speedY = 0;
         } else if(this.currentButton == "right" && (right == 1 || right == 2) && (this.pos[1] == rightPos[1])) {
             this.direction = "right";
-            this.speedX = 1.5;
+            this.speedX = 2;
             this.speedY = 0;
         } else if(this.currentButton == "up" && (up == 1 || up == 2) && (this.pos[0] == upPos[0])) {
             this.direction = "up";
             this.speedX = 0;
-            this.speedY = -1.5;
+            this.speedY = -2;
         } else if(this.currentButton == "down" && (down == 1 || down == 2) && (this.pos[0] == downPos[0])) {
             this.direction = "down";
             this.speedX = 0;
-            this.speedY = 1.5;
+            this.speedY = 2;
         }
     }
 
@@ -62,6 +63,12 @@ class Player {
             let leftCenter = this.map.middle_value[this.row][this.column - 1].slice();
             if(this.pos[0] <= leftCenter[0]) {
                 this.column--;
+                if(this.map.getValue(this.row, this.column) == 2) {
+                    this.map.setValue(this.row, this.column, 1);
+                    this.scoreBox.updateScore(10);
+
+                }
+
                 let result = this.try_direction_change();
 
                 let left = this.map.getValue(this.row, this.column - 1);
@@ -79,9 +86,13 @@ class Player {
             this.pos[1] += this.speedY;
 
             let upCenter = this.map.middle_value[this.row - 1][this.column].slice();
-            console.log(this.pos[1], upCenter);
             if(this.pos[1] <= upCenter[1]) {
                 this.row--;
+                if(this.map.getValue(this.row, this.column) == 2) {
+                    this.map.setValue(this.row, this.column, 1);
+                    this.scoreBox.updateScore(10);
+
+                }
                 // console.log("Row:", this.row);
                 // console.log("Current Button:", this.currentButton);
                 let result = this.try_direction_change();
@@ -91,10 +102,8 @@ class Player {
                 let up = this.map.getValue(this.row - 1, this.column);
                 // console.log("Up Value:", up);
                 if(up != 1 && up != 2 && (!result)) {
-                    console.log(this.row, this.column);
                     this.pos = this.map.middle_value[this.row][this.column].slice();
                     // console.log
-                    console.log(this.pos);
                     this.direction = "none";
                     this.speedX = 0;
                     this.speedY = 0;
@@ -108,6 +117,12 @@ class Player {
             let rightCenter = this.map.middle_value[this.row][this.column + 1].slice();
             if(this.pos[0] >= rightCenter[0]) {
                 this.column++;
+                if(this.map.getValue(this.row, this.column) == 2) {
+                    this.map.setValue(this.row, this.column, 1);
+                    this.scoreBox.updateScore(10);
+
+                }
+
                 let result = this.try_direction_change();
 
                 let right = this.map.getValue(this.row, this.column + 1);
@@ -126,6 +141,11 @@ class Player {
             let downCenter = this.map.middle_value[this.row + 1][this.column].slice();
             if(this.pos[1] >= downCenter[1]) {
                 this.row++;
+                if(this.map.getValue(this.row, this.column) == 2) {
+                    this.map.setValue(this.row, this.column, 1);
+                    this.scoreBox.updateScore(10);
+
+                }
                 let result = this.try_direction_change();
 
                 let down = this.map.getValue(this.row + 1, this.column);
@@ -148,7 +168,7 @@ class Player {
                 this.pos = this.map.middle_value[this.row][this.column].slice();
                 this.direction = "up";
                 this.speedX = 0;
-                this.speedY = -1.5;
+                this.speedY = -2;
                 this.currentButton = null;
                 return true;
             }
@@ -159,7 +179,7 @@ class Player {
                 this.pos = this.map.middle_value[this.row][this.column].slice();
                 this.direction = "down";
                 this.speedX = 0;
-                this.speedY = 1.5;
+                this.speedY = 2;
                 this.currentButton = null;
                 return true;
             }
@@ -169,7 +189,7 @@ class Player {
             if(left == 2 || left == 1) {
                 this.pos = this.map.middle_value[this.row][this.column].slice();
                 this.direction = "left";
-                this.speedX = -1.5;
+                this.speedX = -2;
                 this.speedY = 0;
                 this.currentButton = null;
                 return true;
@@ -180,7 +200,7 @@ class Player {
             if(right == 2 || right == 1) {
                 this.pos = this.map.middle_value[this.row][this.column].slice();
                 this.direction = "right";
-                this.speedX = 1.5;
+                this.speedX = 2;
                 this.speedY = 0;
                 this.currentButton = null;
                 return true;
@@ -256,5 +276,9 @@ class Player {
             ctx.moveTo(x, y);
             ctx.arc(x, y, this.radius, 10 * Math.PI/6, 16 * Math.PI/6);
         }
+    }
+
+    draw_score() {
+        this.scoreBox.draw();
     }
 }

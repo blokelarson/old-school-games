@@ -100,11 +100,15 @@ class Map {
     }
 
     getValue(row, column) {
-        if(row < 0 || row > this.map.length - 1 || column < 0 || column > this.map[0].length - 1) {
+        if(row < 0 || row > this.maze.length - 1 || column < 0 || column > this.maze[0].length - 1) {
             return null;
         } else {
-            return this.map[row][column];
+            return this.maze[row][column];
         }
+    }
+
+    setValue(row, column, value) {
+        this.maze[row][column] = value;
     }
 
     draw() {

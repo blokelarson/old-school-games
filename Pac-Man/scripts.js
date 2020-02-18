@@ -94,6 +94,7 @@ console.log(maze.middle_value);
 
 var player = new Player(maze);
 player.draw();
+player.draw_score();
 
 
 
@@ -112,6 +113,7 @@ function loop() {
     // maze.help_grid();
     player.update_position();
     player.draw();
+    player.draw_score();
     window.requestAnimationFrame(loop);
 }
 
