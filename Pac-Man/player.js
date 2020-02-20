@@ -10,6 +10,9 @@ class Player {
         this.speedY = 0;
         this.direction = "left";
         this.pastdir = null;
+        this.frameCounter = 0;
+        this.dirFrames = [0, 1, 2, 1];
+        this.frameIndex = 0;
         this.currentButton = null;
         this.scoreBox = new Score_Box(canvasContext, canvas.width / 2 - 75, 0, 150, 30, "black");
     }
@@ -79,6 +82,13 @@ class Player {
                     this.speedY = 0;
                     this.currentButton = null;
                 }
+                if (left==-2) {         //Doesn't properly track Pac-Man's position, stays at tunnel after tp
+                    this.pos = this.map.middle_value[this.row][26].slice();
+                    this.direction = "left";
+                    this.speedX = -2;
+                    this.speedY = 0;
+                    this.currentButton = null;
+                }
             }
             // console.log(leftCenter);
         }
@@ -130,6 +140,13 @@ class Player {
                     this.pos = this.map.middle_value[this.row][this.column].slice();
                     this.direction = "none";
                     this.speedX = 0;
+                    this.speedY = 0;
+                    this.currentButton = null;
+                }
+                if (right==-2) {
+                    this.pos = this.map.middle_value[this.row][1].slice();
+                    this.direction = "right";
+                    this.speedX = 2;
                     this.speedY = 0;
                     this.currentButton = null;
                 }
@@ -235,18 +252,22 @@ class Player {
         if (this.speedX > 0){
             dir = "R";
             this.pastdir = dir;
+            this.frame_count();
         }
         else if (this.speedX < 0){
             dir = "L";
             this.pastdir = dir;
+            this.frame_count();
         }
         else if (this.speedY > 0){
             dir = "D";
             this.pastdir = dir;
+            this.frame_count();
         }
         else if (this.speedY < 0){
             dir = "U";
             this.pastdir = dir;
+            this.frame_count();
         }
         else{
             dir = this.pastdir;
@@ -255,26 +276,80 @@ class Player {
         ctx.fill();
         ctx.closePath();
     }
+
+    frame_count(){
+        this.frameCounter++;
+        if (this.frameCounter == 4) {
+            if (this.frameIndex == 3) {
+                this.frameIndex = 0;
+            }
+            else {
+                this.frameIndex++;
+            }
+            this.frameCounter = 0;
+        }
+    }
+
     draw_dir(dir, ctx, x, y){
-        if (dir == "R"){
-            ctx.arc(x, y, this.radius, Math.PI/6, 7 * Math.PI/6);
-            ctx.moveTo(x, y);
-            ctx.arc(x, y, this.radius, 5 * Math.PI/6, 11 * Math.PI/6);
+        if (dir == "R") {
+            if (this.dirFrames[this.frameIndex] == 0) {
+                ctx.arc(x, y, this.radius, 0, 2 * Math.PI);
+            }
+            if (this.dirFrames[this.frameIndex] == 1) {
+                ctx.arc(x, y, this.radius, Math.PI/6, 7 * Math.PI/6);
+                ctx.moveTo(x, y);
+                ctx.arc(x, y, this.radius, 5 * Math.PI/6, 11 * Math.PI/6);
+            }
+            if (this.dirFrames[this.frameIndex] == 2) {
+                ctx.arc(x, y, this.radius, Math.PI/4, 5 * Math.PI/4);
+                ctx.moveTo(x, y);
+                ctx.arc(x, y, this.radius, 3 * Math.PI/4, 7 * Math.PI/4);
+            }
         }
-        else if (dir == "L"){
-            ctx.arc(x, y, this.radius, 5 * Math.PI/6, 11 * Math.PI/6,true);
-            ctx.moveTo(x, y);
-            ctx.arc(x, y, this.radius, 1 * Math.PI/6, 7 * Math.PI/6,true);
+        else if (dir == "L") {
+            if (this.dirFrames[this.frameIndex] == 0) {
+                ctx.arc(x, y, this.radius, 0, 2 * Math.PI);
+            }
+            if (this.dirFrames[this.frameIndex] == 1) {
+                ctx.arc(x, y, this.radius, 5 * Math.PI/6, 11 * Math.PI/6,true);
+                ctx.moveTo(x, y);
+                ctx.arc(x, y, this.radius, 1 * Math.PI/6, 7 * Math.PI/6,true);
+            }
+            if (this.dirFrames[this.frameIndex] == 2) {
+                ctx.arc(x, y, this.radius, 3 * Math.PI/4, 7 * Math.PI/4, true);
+                ctx.moveTo(x, y);
+                ctx.arc(x, y, this.radius, 1 * Math.PI/4, 5 * Math.PI/4, true);
+            }
         }
-        else if (dir == "D"){
-            ctx.arc(x, y, this.radius, 4 * Math.PI/6, 10 * Math.PI/6);
-            ctx.moveTo(x, y);
-            ctx.arc(x, y, this.radius, 8 * Math.PI/6, 14 * Math.PI/6);
+        else if (dir == "D") {
+            if (this.dirFrames[this.frameIndex] == 0) {
+                ctx.arc(x, y, this.radius, 0, 2 * Math.PI);
+            }
+            if (this.dirFrames[this.frameIndex] == 1) {
+                ctx.arc(x, y, this.radius, 4 * Math.PI/6, 10 * Math.PI/6);
+                ctx.moveTo(x, y);
+                ctx.arc(x, y, this.radius, 8 * Math.PI/6, 14 * Math.PI/6);
+            }
+            if (this.dirFrames[this.frameIndex] == 2) {
+                ctx.arc(x, y, this.radius, 5* Math.PI/4, 9 * Math.PI/4);
+                ctx.moveTo(x, y);
+                ctx.arc(x, y, this.radius, 3 * Math.PI/4, 7 * Math.PI/4);
+            }
         }
-        else if (dir == "U"){
-            ctx.arc(x, y, this.radius, 2 * Math.PI/6, 8 * Math.PI/6);
-            ctx.moveTo(x, y);
-            ctx.arc(x, y, this.radius, 10 * Math.PI/6, 16 * Math.PI/6);
+        else if (dir == "U") {
+            if (this.dirFrames[this.frameIndex] == 0) {
+                ctx.arc(x, y, this.radius, 0, 2 * Math.PI);
+            }
+            if (this.dirFrames[this.frameIndex] == 1) {
+                ctx.arc(x, y, this.radius, 2 * Math.PI/6, 8 * Math.PI/6);
+                ctx.moveTo(x, y);
+                ctx.arc(x, y, this.radius, 10 * Math.PI/6, 16 * Math.PI/6);
+            }
+            if (this.dirFrames[this.frameIndex] == 2) {
+                ctx.arc(x, y, this.radius, Math.PI/4, 5 * Math.PI/4);
+                ctx.moveTo(x, y);
+                ctx.arc(x, y, this.radius, 7 * Math.PI/4, 11 * Math.PI/4);
+            }
         }
     }
 
