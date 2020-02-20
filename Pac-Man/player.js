@@ -82,8 +82,9 @@ class Player {
                     this.speedY = 0;
                     this.currentButton = null;
                 }
-                if (left==-2) {         //Doesn't properly track Pac-Man's position, stays at tunnel after tp
+                if (left==-2) {
                     this.pos = this.map.middle_value[this.row][26].slice();
+                    this.column = 26;
                     this.direction = "left";
                     this.speedX = -2;
                     this.speedY = 0;
@@ -138,6 +139,7 @@ class Player {
                 let right = this.map.getValue(this.row, this.column + 1);
                 if(right != 1 && right != 2 && !(result)) {
                     this.pos = this.map.middle_value[this.row][this.column].slice();
+                    this.column = 1;
                     this.direction = "none";
                     this.speedX = 0;
                     this.speedY = 0;
